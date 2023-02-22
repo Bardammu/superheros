@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
 
@@ -77,6 +78,42 @@ public class SuperheroServiceTestCase {
     }
 
     @Test
+    public void addSuperheroWithRepeatedName() {
+        Superhero secondSuperman = new Superhero();
+        secondSuperman.setName("Superman");
+        secondSuperman.setGender("Male");
+        secondSuperman.setOrigin("Buenos Aires, Argentina, Earth");
+        secondSuperman.setBirthdate(Date.valueOf("1967-08-10"));
+
+        assertThrows(Exception .class,
+                () -> superheroService.addSuperhero(secondSuperman),
+                "Expected superheroService#addSuperhero(secondSuperman) to throw IllegalArgumentException , but it didn't"
+        );
+
+        List<Superhero> superheroes = superheroService.getSuperheroes();
+
+        assertThat(superheroes.size(), is(2));
+    }
+
+    @Test
+    public void addSuperheroWithoutName() {
+        Superhero noNameSuperhero = new Superhero();
+        noNameSuperhero.setGender("Male");
+        noNameSuperhero.setOrigin("New York, US, Earth");
+        noNameSuperhero.setBirthdate(Date.valueOf("1962-08-10"));
+
+        assertThrows(Exception.class,
+                () -> superheroService.addSuperhero(noNameSuperhero),
+                "Expected superheroService#addSuperhero(noNameSuperhero) to throw ConstraintViolationException , but it didn't"
+        );
+
+        List<Superhero> superheroes = superheroService.getSuperheroes();
+
+        assertThat(superheroes.size(), is(2));
+        assertThat(superheroes, not(hasItem(hasProperty("name", is("Spiderman")))));
+    }
+
+    @Test
     public void removeSuperheroById() {
         boolean removedSuperhero = superheroService.removeSuperhero(1);
         Optional<Superhero> superhero = superheroService.getSuperhero(1);
@@ -90,5 +127,16 @@ public class SuperheroServiceTestCase {
         boolean removedSuperhero = superheroService.removeSuperhero(10000);
 
         assertThat(removedSuperhero, is(false));
+    }
+
+    @Test
+    public void removeSuperheroByIdInvalid() {
+        IllegalArgumentException  exception = assertThrows(
+                IllegalArgumentException .class,
+                () -> superheroService.removeSuperhero(-1),
+                "Expected superheroService#removeSuperhero(-1) to throw IllegalArgumentException , but it didn't"
+        );
+
+        assertThat(exception.getMessage(), equalTo("Invalid Superhero Id -1, must be greater than 0"));
     }
 }
