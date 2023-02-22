@@ -64,4 +64,9 @@ public class DefaultSuperheroService implements SuperheroService {
         return superheroRepository.findAll(specification);
     }
 
+    @Override
+    public Superhero updateSuperhero(Superhero superhero) {
+        return superheroRepository.saveAndFlush(superhero);
+    }
+
 }

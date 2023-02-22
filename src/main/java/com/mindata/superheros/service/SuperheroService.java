@@ -52,4 +52,12 @@ public interface SuperheroService {
      *         attribute
      */
     List<Superhero> getSuperheroFilterBy(String attribute, String subString);
+
+    /**
+     * Updates a {@link Superhero}
+     *
+     * @param superhero the modified {@link Superhero}
+     * @return the updated {@link Superhero}
+     */
+    Superhero updateSuperhero(Superhero superhero);
 }
