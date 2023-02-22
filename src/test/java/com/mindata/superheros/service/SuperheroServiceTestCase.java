@@ -1,6 +1,8 @@
 package com.mindata.superheros.service;
 
 import com.mindata.superheros.model.Superhero;
+import net.bytebuddy.implementation.bind.annotation.Super;
+import org.hibernate.boot.model.source.spi.SubclassEntitySource;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -131,12 +133,28 @@ public class SuperheroServiceTestCase {
 
     @Test
     public void removeSuperheroByIdInvalid() {
-        IllegalArgumentException  exception = assertThrows(
-                IllegalArgumentException .class,
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
                 () -> superheroService.removeSuperhero(-1),
                 "Expected superheroService#removeSuperhero(-1) to throw IllegalArgumentException , but it didn't"
         );
 
         assertThat(exception.getMessage(), equalTo("Invalid Superhero Id -1, must be greater than 0"));
+    }
+
+    @Test
+    public void getSuperheroFilterByNameSubstring() {
+        List<Superhero> superheroes = superheroService.getSuperheroesFilterBy("name", "man");
+
+        assertThat(superheroes.size(), is(2));
+        assertThat(superheroes, hasItem(hasProperty("name", is("Superman"))));
+        assertThat(superheroes, hasItem(hasProperty("name", is("Iron Man"))));
+    }
+
+    @Test
+    public void getSuperheroFilterByNameSubstringNotExisting() {
+        List<Superhero> superheroes = superheroService.getSuperheroesFilterBy("name", "what?");
+
+        assertThat(superheroes.size(), is(0));
     }
 }
