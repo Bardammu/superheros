@@ -163,4 +163,19 @@ public class SuperheroServiceTestCase {
 
         assertThat(superheroes.size(), is(0));
     }
+
+    @Test
+    public void updateSuperhero() throws Exception {
+        Optional<Superhero> superman = superheroService.getSuperhero(1);
+        Superhero updatedSuperman = superman.orElseThrow(() -> new Exception("Couldn't get old Superman to update"));
+        updatedSuperman.setOrigin("Buenos Aires, Argentina, Earth");
+
+        Superhero superhero = superheroService.updateSuperhero(updatedSuperman);
+        List<Superhero> superheros = superheroService.getSuperheroes();
+
+        assertThat(superheros.size(), is(2));
+        assertThat(superhero.getName(), equalTo("Superman"));
+        assertThat(superhero.getOrigin(), equalTo("Buenos Aires, Argentina, Earth"));
+    }
+
 }
