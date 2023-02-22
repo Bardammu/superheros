@@ -13,9 +13,9 @@ import java.util.Optional;
 public interface SuperheroService {
 
     /**
-     * Get a lists of superheros
+     * Get a lists of all superheros
      *
-     * @return a {@link List} of {@link Superhero Superheros}
+     * @return a {@link List} of all {@link Superhero Superheros}
      */
     List<Superhero> getSuperheroes();
 
@@ -43,4 +43,13 @@ public interface SuperheroService {
      */
     boolean removeSuperhero(Integer superheroId);
 
+    /**
+     * Get the list {@link Superhero Superheros} that contains the given sub String on the given attribute
+     *
+     * @param attribute the {@link Superhero}'s attribute to be use on the filter
+     * @param subString the {@link String} to filter by
+     * @return a {@link List} of all {@link Superhero Superheros} that contains the given sub String on the given
+     *         attribute
+     */
+    List<Superhero> getSuperheroFilterBy(String attribute, String subString);
 }

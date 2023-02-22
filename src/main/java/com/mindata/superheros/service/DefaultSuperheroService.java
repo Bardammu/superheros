@@ -3,6 +3,7 @@ package com.mindata.superheros.service;
 import com.mindata.superheros.model.Superhero;
 import com.mindata.superheros.repository.SuperheroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -53,6 +54,14 @@ public class DefaultSuperheroService implements SuperheroService {
         }
         superheroRepository.deleteById(superheroId);
         return true;
+    }
+
+    @Override
+    public List<Superhero> getSuperheroFilterBy(String attribute, String subString) {
+        Specification<Superhero> specification = (root, query, criteriaBuilder)
+                -> criteriaBuilder.like(criteriaBuilder.lower(root.get(attribute)), "%" + subString.toLowerCase() + "%");
+
+        return superheroRepository.findAll(specification);
     }
 
 }

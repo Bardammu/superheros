@@ -1,8 +1,6 @@
 package com.mindata.superheros.service;
 
 import com.mindata.superheros.model.Superhero;
-import net.bytebuddy.implementation.bind.annotation.Super;
-import org.hibernate.boot.model.source.spi.SubclassEntitySource;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -144,7 +142,7 @@ public class SuperheroServiceTestCase {
 
     @Test
     public void getSuperheroFilterByNameSubstring() {
-        List<Superhero> superheroes = superheroService.getSuperheroesFilterBy("name", "man");
+        List<Superhero> superheroes = superheroService.getSuperheroFilterBy("name", "man");
 
         assertThat(superheroes.size(), is(2));
         assertThat(superheroes, hasItem(hasProperty("name", is("Superman"))));
@@ -152,8 +150,16 @@ public class SuperheroServiceTestCase {
     }
 
     @Test
+    public void getSuperheroFilterByOriginSubstring() {
+        List<Superhero> superheroes = superheroService.getSuperheroFilterBy("origin", "New York");
+
+        assertThat(superheroes.size(), is(1));
+        assertThat(superheroes, hasItem(hasProperty("name", is("Iron Man"))));
+    }
+
+    @Test
     public void getSuperheroFilterByNameSubstringNotExisting() {
-        List<Superhero> superheroes = superheroService.getSuperheroesFilterBy("name", "what?");
+        List<Superhero> superheroes = superheroService.getSuperheroFilterBy("name", "what?");
 
         assertThat(superheroes.size(), is(0));
     }
