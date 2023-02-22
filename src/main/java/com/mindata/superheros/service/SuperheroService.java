@@ -24,7 +24,7 @@ public interface SuperheroService {
      *
      * @param superheroId the Superhero's id
      * @return a {@link Superhero} if the {@link Superhero} id is present, an empty {@link Optional} otherwise
-     *
+     * @throws IllegalArgumentException if the superhero id is not a valid id
      */
     Optional<Superhero> getSuperhero(Integer superheroId);
 
@@ -39,6 +39,7 @@ public interface SuperheroService {
      *
      * @param superheroId the {@link Superhero}
      * @return {@code true} if a {@link Superhero} was removed, {@code false} otherwise
+     * @throws IllegalArgumentException if the superhero id is not a valid id
      */
     boolean removeSuperhero(Integer superheroId);
 

@@ -1,8 +1,10 @@
 package com.mindata.superheros.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 
 import java.sql.Date;
 
@@ -20,6 +22,8 @@ public class Superhero {
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
 
+    @NotBlank(message = "Name should not be null or blank")
+    @Column(unique = true)
     private String name;
 
     private String gender;

@@ -30,7 +30,7 @@ public class DefaultSuperheroService implements SuperheroService {
     }
 
     @Override
-    public Optional<Superhero> getSuperhero(Integer superheroId) {
+    public Optional<Superhero> getSuperhero(Integer superheroId) throws IllegalArgumentException {
         if (superheroId <= 0) {
             throw new IllegalArgumentException(format("Invalid Superhero Id %s, must be greater than 0", superheroId));
         }
@@ -44,7 +44,10 @@ public class DefaultSuperheroService implements SuperheroService {
     }
 
     @Override
-    public boolean removeSuperhero(Integer superheroId) {
+    public boolean removeSuperhero(Integer superheroId) throws IllegalArgumentException {
+        if (superheroId <= 0) {
+            throw new IllegalArgumentException(format("Invalid Superhero Id %s, must be greater than 0", superheroId));
+        }
         if (!superheroRepository.existsById(superheroId)) {
             return false;
         }
