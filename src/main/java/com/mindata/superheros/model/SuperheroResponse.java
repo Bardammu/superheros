@@ -4,6 +4,8 @@ import java.sql.Date;
 
 public class SuperheroResponse {
 
+    private final Integer id;
+
     private final String name;
 
     private final String gender;
@@ -12,11 +14,16 @@ public class SuperheroResponse {
 
     private final Date birthdate;
 
-    public SuperheroResponse(String name, String gender, String origin, Date birthdate) {
+    public SuperheroResponse(Integer id, String name, String gender, String origin, Date birthdate) {
+        this.id = id;
         this.name = name;
         this.gender = gender;
         this.origin = origin;
         this.birthdate = birthdate;
+    }
+
+    public Integer getId() {
+        return id;
     }
 
     public String getName() {
