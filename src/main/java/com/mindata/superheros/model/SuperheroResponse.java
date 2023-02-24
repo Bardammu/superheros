@@ -2,43 +2,58 @@ package com.mindata.superheros.model;
 
 import java.sql.Date;
 
+/**
+ * POJO that represents a API response containing the {@link Superhero} data
+ */
 public class SuperheroResponse {
 
-    private final Integer id;
+    private Integer id;
 
-    private final String name;
+    private String name;
 
-    private final String gender;
+    private String gender;
 
-    private final String origin;
+    private String origin;
 
-    private final Date birthdate;
-
-    public SuperheroResponse(Integer id, String name, String gender, String origin, Date birthdate) {
-        this.id = id;
-        this.name = name;
-        this.gender = gender;
-        this.origin = origin;
-        this.birthdate = birthdate;
-    }
+    private Date birthdate;
 
     public Integer getId() {
         return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getGender() {
         return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getOrigin() {
         return origin;
     }
 
+    public void setOrigin(String origin) {
+        this.origin = origin;
+    }
+
     public Date getBirthdate() {
         return birthdate;
+    }
+
+    public void setBirthdate(Date birthdate) {
+        this.birthdate = birthdate;
     }
 }

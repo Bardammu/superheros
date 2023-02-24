@@ -1,6 +1,7 @@
 package com.mindata.superheros.controller;
 
 import com.github.fge.jsonpatch.JsonPatch;
+import com.mindata.superheros.model.ModelUtils;
 import com.mindata.superheros.model.Superhero;
 import com.mindata.superheros.model.SuperheroRequest;
 import com.mindata.superheros.model.SuperheroResponse;
@@ -20,13 +21,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
+import static com.mindata.superheros.model.ModelUtils.getSuperheroFromRequest;
+import static com.mindata.superheros.model.ModelUtils.getSuperheroResponseFromSuperhero;
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.ResponseEntity.accepted;
+import static org.springframework.http.ResponseEntity.badRequest;
+import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @RequestMapping("/api/superheros")
@@ -39,71 +47,61 @@ public class SuperheroController {
     }
 
     @GetMapping
-    public List<Superhero> getSuperheros(@RequestParam Map<String, String> filteringParams) {
-        return superheroService.getSuperheroFilterBy(filteringParams);
+    public ResponseEntity<List<SuperheroResponse>> getSuperheros(@RequestParam Map<String, String> filteringParams) {
+        List<Superhero> superheroes = superheroService.getSuperheroFilterBy(filteringParams);
+        List<SuperheroResponse> superheroResponses = superheroes.stream()
+                .map(ModelUtils::getSuperheroResponseFromSuperhero).toList();
+
+        return ok(superheroResponses);
     }
 
     @GetMapping("/{superheroId}")
     public ResponseEntity<SuperheroResponse> getSuperhero(@PathVariable Integer superheroId) {
         Optional<Superhero> superhero = superheroService.getSuperhero(superheroId);
-        return superhero.map(s -> {
-            SuperheroResponse superheroResponse = new SuperheroResponse(s.getId(), s.getName(), s.getGender(), s.getOrigin(), s.getBirthdate());
-            return new ResponseEntity<>(superheroResponse, OK);
-        }).orElse(new ResponseEntity<>(NOT_FOUND));
+
+        return superhero.map(s -> ok(getSuperheroResponseFromSuperhero(superhero.get()))).orElse(status(NOT_FOUND).build());
     }
 
     @PostMapping
     @ResponseStatus(CREATED)
-    public SuperheroResponse postSuperhero(@RequestBody SuperheroRequest request) {
-        Superhero superhero = new Superhero();
-
-        superhero.setName(request.getName());
-        superhero.setGender(request.getGender());
-        superhero.setOrigin(request.getOrigin());
-        superhero.setBirthdate(request.getBirthdate());
-
+    public ResponseEntity<SuperheroResponse> postSuperhero(@RequestBody SuperheroRequest request) {
+        Superhero superhero = getSuperheroFromRequest(request);
         superhero = superheroService.addSuperhero(superhero);
 
-        return new SuperheroResponse(superhero.getId(), superhero.getName(), superhero.getGender(),
-                superhero.getOrigin(), superhero.getBirthdate());
+        return status(CREATED).body(getSuperheroResponseFromSuperhero(superhero));
+    }
+
+    @PatchMapping(path = "/{superheroId}", consumes = "application/json")
+    @ResponseStatus(ACCEPTED)
+    public ResponseEntity<SuperheroResponse> updateSuperhero(@PathVariable Integer superheroId, @RequestBody SuperheroRequest request) {
+        if (!Objects.equals(superheroId, request.getId())) {
+            return badRequest().build();
         }
 
-        @PatchMapping(path = "/{superheroId}", consumes = "application/json")
-        @ResponseStatus(ACCEPTED)
-        public SuperheroResponse updateSuperhero(@PathVariable Integer superheroId, @RequestBody SuperheroRequest request) {
-            Superhero superhero = new Superhero();
+        Superhero superhero = getSuperheroFromRequest(request);
+        superhero = superheroService.updateSuperhero(superhero);
 
-            superhero.setId(request.getId());
-            superhero.setName(request.getName());
-            superhero.setGender(request.getGender());
-            superhero.setOrigin(request.getOrigin());
-            superhero.setBirthdate(request.getBirthdate());
+        return accepted().body(getSuperheroResponseFromSuperhero(superhero));
+    }
 
-            superhero = superheroService.updateSuperhero(superhero);
-
-            return new SuperheroResponse(superhero.getId(), superhero.getName(), superhero.getGender(),
-                    superhero.getOrigin(), superhero.getBirthdate());
+    @PatchMapping(path = "/{superheroId}", consumes = "application/json-patch+json")
+    @ResponseStatus(ACCEPTED)
+    public ResponseEntity<SuperheroResponse> updateSuperhero(@PathVariable Integer superheroId, @RequestBody JsonPatch jsonPatchRequest) throws Exception {
+        Optional<Superhero> superhero = superheroService.getSuperhero(superheroId);
+        if (superhero.isPresent()) {
+            Superhero updatedSuperhero = superheroService.updateSuperhero(superhero.get(), jsonPatchRequest);
+            return accepted().body(getSuperheroResponseFromSuperhero(updatedSuperhero));
+        } else {
+            return status(NOT_FOUND).contentType(APPLICATION_JSON).build();
         }
+    }
 
-        @PatchMapping(path = "/{superheroId}", consumes = "application/json-patch+json")
-        @ResponseStatus(ACCEPTED)
-        public ResponseEntity<SuperheroResponse> updateSuperhero(@PathVariable Integer superheroId, @RequestBody JsonPatch jsonPatchRequest) throws Exception {
-            Optional<Superhero> superhero = superheroService.getSuperhero(superheroId);
-            if (superhero.isPresent()) {
-                Superhero updatedSuperhero = superheroService.updateSuperhero(superhero.get(), jsonPatchRequest);
-                SuperheroResponse superheroResponse= new SuperheroResponse(updatedSuperhero.getId(), updatedSuperhero.getName(),
-                        updatedSuperhero.getGender(), updatedSuperhero.getOrigin(), updatedSuperhero.getBirthdate());
-                return new ResponseEntity<>(superheroResponse, ACCEPTED);
-            } else {
-                return new ResponseEntity<>(NOT_FOUND);
-            }
-        }
+    @DeleteMapping("/{superheroId}")
+    public ResponseEntity<String> removeSuperhero(@PathVariable Integer superheroId) {
+        boolean deleted = superheroService.removeSuperhero(superheroId);
 
-        @DeleteMapping("/{superheroId}")
-        public ResponseEntity<String> removeSuperhero(@PathVariable Integer superheroId) {
-            boolean deleted = superheroService.removeSuperhero(superheroId);
-            return deleted ? new ResponseEntity<>(NO_CONTENT) :  new ResponseEntity<>(NOT_FOUND);
-        }
+        return deleted ? status(NO_CONTENT).contentType(APPLICATION_JSON).build()
+                : status(NOT_FOUND).contentType(APPLICATION_JSON).build();
+    }
 
 }
-
