@@ -10,6 +10,7 @@ import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -70,11 +71,14 @@ public class SuperheroServiceTestCase {
         spiderman.setOrigin("New York, US, Earth");
         spiderman.setBirthdate(Date.valueOf("1962-08-10"));
 
-        superheroService.addSuperhero(spiderman);
+        Superhero newSuperhero = superheroService.addSuperhero(spiderman);
         List<Superhero> superheroes = superheroService.getSuperheroes();
 
+
+        assertThat(newSuperhero.getName(), equalTo("Spiderman"));
+        assertThat(newSuperhero.getId(), is(3));
         assertThat(superheroes.size(), is(3));
-        assertThat(superheroes, hasItem(hasProperty("name", is("Spiderman"))));
+        assertThat(superheroes, hasItem(hasProperty("name", equalTo("Spiderman"))));
     }
 
     @Test
@@ -142,7 +146,7 @@ public class SuperheroServiceTestCase {
 
     @Test
     public void getSuperheroFilterByNameSubstring() {
-        List<Superhero> superheroes = superheroService.getSuperheroFilterBy("name", "man");
+        List<Superhero> superheroes = superheroService.getSuperheroFilterBy(singletonMap("name", "man"));
 
         assertThat(superheroes.size(), is(2));
         assertThat(superheroes, hasItem(hasProperty("name", is("Superman"))));
@@ -151,7 +155,7 @@ public class SuperheroServiceTestCase {
 
     @Test
     public void getSuperheroFilterByOriginSubstring() {
-        List<Superhero> superheroes = superheroService.getSuperheroFilterBy("origin", "New York");
+        List<Superhero> superheroes = superheroService.getSuperheroFilterBy(singletonMap("origin", "New York"));
 
         assertThat(superheroes.size(), is(1));
         assertThat(superheroes, hasItem(hasProperty("name", is("Iron Man"))));
@@ -159,7 +163,7 @@ public class SuperheroServiceTestCase {
 
     @Test
     public void getSuperheroFilterByNameSubstringNotExisting() {
-        List<Superhero> superheroes = superheroService.getSuperheroFilterBy("name", "what?");
+        List<Superhero> superheroes = superheroService.getSuperheroFilterBy(singletonMap("name", "what?"));
 
         assertThat(superheroes.size(), is(0));
     }

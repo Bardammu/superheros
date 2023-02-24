@@ -2,11 +2,14 @@ package com.mindata.superheros.service;
 
 import com.mindata.superheros.model.Superhero;
 import com.mindata.superheros.repository.SuperheroRepository;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -40,8 +43,8 @@ public class DefaultSuperheroService implements SuperheroService {
     }
 
     @Override
-    public void addSuperhero(Superhero superhero) {
-        superheroRepository.saveAndFlush(superhero);
+    public Superhero addSuperhero(Superhero superhero) {
+        return superheroRepository.saveAndFlush(superhero);
     }
 
     @Override
@@ -56,10 +59,15 @@ public class DefaultSuperheroService implements SuperheroService {
         return true;
     }
 
-    @Override
-    public List<Superhero> getSuperheroFilterBy(String attribute, String subString) {
-        Specification<Superhero> specification = (root, query, criteriaBuilder)
-                -> criteriaBuilder.like(criteriaBuilder.lower(root.get(attribute)), "%" + subString.toLowerCase() + "%");
+    public List<Superhero> getSuperheroFilterBy(Map<String, String> filteringParameters) {
+        Specification<Superhero> specification = (root, query, criteriaBuilder) -> {
+            String sqlFormat = "%%%s%%";
+            List<Predicate> predicates = new ArrayList<>();
+            filteringParameters.forEach((param, value) ->
+                    predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get(param)), format(sqlFormat, value.toLowerCase()))) );
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
 
         return superheroRepository.findAll(specification);
     }

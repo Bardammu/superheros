@@ -3,6 +3,7 @@ package com.mindata.superheros.service;
 import com.mindata.superheros.model.Superhero;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -30,9 +31,11 @@ public interface SuperheroService {
 
     /**
      * Add a {@link Superhero}
+     *
      * @param superhero the {@link Superhero}
+     * @return the new {@link Superhero}
      */
-    void addSuperhero(Superhero superhero);
+    Superhero addSuperhero(Superhero superhero);
 
     /**
      * Remove a {@link Superhero} with the given {@link Superhero} id
@@ -44,14 +47,13 @@ public interface SuperheroService {
     boolean removeSuperhero(Integer superheroId);
 
     /**
-     * Get the list {@link Superhero Superheros} that contains the given sub String on the given attribute
+     * Get the list {@link Superhero Superheros} filtered by the given filtering parameters.
      *
-     * @param attribute the {@link Superhero}'s attribute to be use on the filter
-     * @param subString the {@link String} to filter by
-     * @return a {@link List} of all {@link Superhero Superheros} that contains the given sub String on the given
-     *         attribute
+     * @param filteringParameters {@link Map} where its keys are {@link Superhero} attributes and its values substring
+     *                            to be used as filters on the attributes.
+     * @return a {@link List} of all the filtered {@link Superhero Superheros}
      */
-    List<Superhero> getSuperheroFilterBy(String attribute, String subString);
+    List<Superhero> getSuperheroFilterBy(Map<String, String> filteringParameters);
 
     /**
      * Updates a {@link Superhero}
