@@ -1,10 +1,13 @@
 package com.mindata.superheros.controller;
 
+import com.github.fge.jsonpatch.JsonPatch;
 import com.mindata.superheros.model.Superhero;
 import com.mindata.superheros.model.SuperheroRequest;
 import com.mindata.superheros.model.SuperheroResponse;
 import com.mindata.superheros.service.SuperheroService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +24,9 @@ import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/api/superheros")
@@ -38,14 +44,12 @@ public class SuperheroController {
     }
 
     @GetMapping("/{superheroId}")
-    public SuperheroResponse getSuperhero(@PathVariable Integer superheroId) {
+    public ResponseEntity<SuperheroResponse> getSuperhero(@PathVariable Integer superheroId) {
         Optional<Superhero> superhero = superheroService.getSuperhero(superheroId);
-        if (superhero.isPresent()) {
-            Superhero s = superhero.get();
-            return new SuperheroResponse(s.getId(), s.getName(), s.getGender(), s.getOrigin(), s.getBirthdate());
-        } else {
-            return new SuperheroResponse(null, null, null, null, null);
-        }
+        return superhero.map(s -> {
+            SuperheroResponse superheroResponse = new SuperheroResponse(s.getId(), s.getName(), s.getGender(), s.getOrigin(), s.getBirthdate());
+            return new ResponseEntity<>(superheroResponse, OK);
+        }).orElse(new ResponseEntity<>(NOT_FOUND));
     }
 
     @PostMapping
@@ -64,9 +68,9 @@ public class SuperheroController {
                 superhero.getOrigin(), superhero.getBirthdate());
         }
 
-        @PatchMapping
+        @PatchMapping(path = "/{superheroId}", consumes = "application/json")
         @ResponseStatus(ACCEPTED)
-        public SuperheroResponse updateSuperhero(@RequestBody SuperheroRequest request) {
+        public SuperheroResponse updateSuperhero(@PathVariable Integer superheroId, @RequestBody SuperheroRequest request) {
             Superhero superhero = new Superhero();
 
             superhero.setId(request.getId());
@@ -80,4 +84,26 @@ public class SuperheroController {
             return new SuperheroResponse(superhero.getId(), superhero.getName(), superhero.getGender(),
                     superhero.getOrigin(), superhero.getBirthdate());
         }
+
+        @PatchMapping(path = "/{superheroId}", consumes = "application/json-patch+json")
+        @ResponseStatus(ACCEPTED)
+        public ResponseEntity<SuperheroResponse> updateSuperhero(@PathVariable Integer superheroId, @RequestBody JsonPatch jsonPatchRequest) throws Exception {
+            Optional<Superhero> superhero = superheroService.getSuperhero(superheroId);
+            if (superhero.isPresent()) {
+                Superhero updatedSuperhero = superheroService.updateSuperhero(superhero.get(), jsonPatchRequest);
+                SuperheroResponse superheroResponse= new SuperheroResponse(updatedSuperhero.getId(), updatedSuperhero.getName(),
+                        updatedSuperhero.getGender(), updatedSuperhero.getOrigin(), updatedSuperhero.getBirthdate());
+                return new ResponseEntity<>(superheroResponse, ACCEPTED);
+            } else {
+                return new ResponseEntity<>(NOT_FOUND);
+            }
+        }
+
+        @DeleteMapping("/{superheroId}")
+        public ResponseEntity<String> removeSuperhero(@PathVariable Integer superheroId) {
+            boolean deleted = superheroService.removeSuperhero(superheroId);
+            return deleted ? new ResponseEntity<>(NO_CONTENT) :  new ResponseEntity<>(NOT_FOUND);
+        }
+
 }
+

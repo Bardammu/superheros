@@ -1,5 +1,6 @@
 package com.mindata.superheros.service;
 
+import com.github.fge.jsonpatch.JsonPatch;
 import com.mindata.superheros.model.Superhero;
 
 import java.util.List;
@@ -62,4 +63,6 @@ public interface SuperheroService {
      * @return the updated {@link Superhero}
      */
     Superhero updateSuperhero(Superhero superhero);
+
+    Superhero updateSuperhero(Superhero superhero, JsonPatch jsonPatch) throws Exception;
 }

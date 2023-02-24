@@ -32,4 +32,8 @@ public abstract class IntegrationITCase {
         restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }
 
+    protected TestRestTemplate restTemplateBasicAuth() {
+        return restTemplate.withBasicAuth("user", "password");
+    }
+
 }

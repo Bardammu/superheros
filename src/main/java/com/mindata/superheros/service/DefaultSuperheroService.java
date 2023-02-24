@@ -1,8 +1,14 @@
 package com.mindata.superheros.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import com.mindata.superheros.model.Superhero;
 import com.mindata.superheros.repository.SuperheroRepository;
 import jakarta.persistence.criteria.Predicate;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -13,6 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.lang.String.format;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Default implementation of {@link SuperheroService} service
@@ -21,6 +28,8 @@ import static java.lang.String.format;
  */
 @Service
 public class DefaultSuperheroService implements SuperheroService {
+
+    Logger logger = getLogger(DefaultSuperheroService.class);
 
     private final SuperheroRepository superheroRepository;
 
@@ -77,4 +86,20 @@ public class DefaultSuperheroService implements SuperheroService {
         return superheroRepository.saveAndFlush(superhero);
     }
 
+    @Override
+    public Superhero updateSuperhero(Superhero superhero, JsonPatch jsonPatch) throws Exception {
+        try {
+            Superhero patchedSuperhero = applyPatchToSuperhero(jsonPatch, superhero);
+            return superheroRepository.saveAndFlush(patchedSuperhero);
+        } catch (Exception e) {
+            logger.error("Can't perform operation update on {}", superhero.getId());
+            throw new Exception(format("Can't perform operation update on %s", superhero.getId()));
+        }
+    }
+
+    private Superhero applyPatchToSuperhero(JsonPatch patch, Superhero superhero) throws JsonPatchException, JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode patched = patch.apply(objectMapper.convertValue(superhero, JsonNode.class));
+        return objectMapper.treeToValue(patched, Superhero.class);
+    }
 }
