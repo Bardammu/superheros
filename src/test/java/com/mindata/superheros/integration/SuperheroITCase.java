@@ -25,7 +25,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-public class SuperheroITCase extends IntegrationITCase{
+public class SuperheroITCase extends IntegrationITCase {
 
     @Test
     public void getSuperheros() {
