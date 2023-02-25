@@ -9,6 +9,8 @@ import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
+import static jakarta.persistence.CascadeType.ALL;
+
 /**
  * Entity representing a User
  *
@@ -29,7 +31,7 @@ public class User {
     @NotNull
     private Boolean enabled;
 
-    @OneToMany(mappedBy = "username")
+    @OneToMany(mappedBy = "username", cascade = ALL)
     private List<Authority> roles;
 
     public String getUsername() {
