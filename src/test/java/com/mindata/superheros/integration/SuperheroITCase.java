@@ -154,7 +154,7 @@ public class SuperheroITCase extends IntegrationITCase{
         headers.setContentType(new MediaType("application", "json-patch+json"));
         HttpEntity<String> entity = new HttpEntity<>(patchJsonBody, headers);
 
-        ResponseEntity<SuperheroResponse> responseEntity = restTemplateBasicAuth().exchange(URL, PATCH, entity, SuperheroResponse.class);
+        ResponseEntity<String> responseEntity = restTemplateBasicAuth().exchange(URL, PATCH, entity, String.class);
 
         assertThat(responseEntity.getStatusCode(), is(BAD_REQUEST));
         assertThat(responseEntity.getHeaders().getContentType(), is(APPLICATION_JSON));

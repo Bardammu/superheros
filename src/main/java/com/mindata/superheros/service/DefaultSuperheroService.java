@@ -8,7 +8,6 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.mindata.superheros.model.Superhero;
 import com.mindata.superheros.repository.SuperheroRepository;
 import jakarta.persistence.criteria.Predicate;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.lang.String.format;
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Default implementation of {@link SuperheroService} service
@@ -28,8 +26,6 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 @Service
 public class DefaultSuperheroService implements SuperheroService {
-
-    Logger logger = getLogger(DefaultSuperheroService.class);
 
     private final SuperheroRepository superheroRepository;
 
@@ -87,19 +83,18 @@ public class DefaultSuperheroService implements SuperheroService {
     }
 
     @Override
-    public Superhero updateSuperhero(Superhero superhero, JsonPatch jsonPatch) throws Exception {
-        try {
-            Superhero patchedSuperhero = applyPatchToSuperhero(jsonPatch, superhero);
-            return superheroRepository.saveAndFlush(patchedSuperhero);
-        } catch (Exception e) {
-            logger.error("Can't perform operation update on {}", superhero.getId());
-            throw new Exception(format("Can't perform operation update on %s", superhero.getId()));
-        }
+    public Superhero updateSuperhero(Superhero superhero, JsonPatch jsonPatch) throws IllegalArgumentException {
+        Superhero patchedSuperhero = applyPatchToSuperhero(jsonPatch, superhero);
+        return superheroRepository.saveAndFlush(patchedSuperhero);
     }
 
-    private Superhero applyPatchToSuperhero(JsonPatch patch, Superhero superhero) throws JsonPatchException, JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode patched = patch.apply(objectMapper.convertValue(superhero, JsonNode.class));
-        return objectMapper.treeToValue(patched, Superhero.class);
+    private Superhero applyPatchToSuperhero(JsonPatch patch, Superhero superhero) throws IllegalArgumentException {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode patched = patch.apply(objectMapper.convertValue(superhero, JsonNode.class));
+            return objectMapper.treeToValue(patched, Superhero.class);
+        } catch (JsonPatchException | JsonProcessingException e) {
+            throw new IllegalArgumentException(format("Can't perform update operation on superhero %s", superhero.getId()));
+        }
     }
 }

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -26,7 +25,6 @@ import java.util.Optional;
 
 import static com.mindata.superheros.model.ModelUtils.getSuperheroFromRequest;
 import static com.mindata.superheros.model.ModelUtils.getSuperheroResponseFromSuperhero;
-import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -63,7 +61,6 @@ public class SuperheroController {
     }
 
     @PostMapping
-    @ResponseStatus(CREATED)
     public ResponseEntity<SuperheroResponse> postSuperhero(@RequestBody SuperheroRequest request) {
         Superhero superhero = getSuperheroFromRequest(request);
         superhero = superheroService.addSuperhero(superhero);
@@ -72,7 +69,6 @@ public class SuperheroController {
     }
 
     @PatchMapping(path = "/{superheroId}", consumes = "application/json")
-    @ResponseStatus(ACCEPTED)
     public ResponseEntity<SuperheroResponse> updateSuperhero(@PathVariable Integer superheroId, @RequestBody SuperheroRequest request) {
         if (!Objects.equals(superheroId, request.getId())) {
             return badRequest().build();
@@ -85,8 +81,7 @@ public class SuperheroController {
     }
 
     @PatchMapping(path = "/{superheroId}", consumes = "application/json-patch+json")
-    @ResponseStatus(ACCEPTED)
-    public ResponseEntity<SuperheroResponse> updateSuperhero(@PathVariable Integer superheroId, @RequestBody JsonPatch jsonPatchRequest) throws Exception {
+    public ResponseEntity<SuperheroResponse> updateSuperhero(@PathVariable Integer superheroId, @RequestBody JsonPatch jsonPatchRequest) {
         Optional<Superhero> superhero = superheroService.getSuperhero(superheroId);
         if (superhero.isPresent()) {
             Superhero updatedSuperhero = superheroService.updateSuperhero(superhero.get(), jsonPatchRequest);

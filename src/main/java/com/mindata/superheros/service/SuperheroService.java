@@ -28,7 +28,7 @@ public interface SuperheroService {
      * @return a {@link Superhero} if the {@link Superhero} id is present, an empty {@link Optional} otherwise
      * @throws IllegalArgumentException if the superhero id is not a valid id
      */
-    Optional<Superhero> getSuperhero(Integer superheroId);
+    Optional<Superhero> getSuperhero(Integer superheroId) throws IllegalArgumentException;
 
     /**
      * Add a {@link Superhero}
@@ -45,7 +45,7 @@ public interface SuperheroService {
      * @return {@code true} if a {@link Superhero} was removed, {@code false} otherwise
      * @throws IllegalArgumentException if the superhero id is not a valid id
      */
-    boolean removeSuperhero(Integer superheroId);
+    boolean removeSuperhero(Integer superheroId) throws IllegalArgumentException;
 
     /**
      * Get the list {@link Superhero Superheros} filtered by the given filtering parameters.
@@ -64,5 +64,16 @@ public interface SuperheroService {
      */
     Superhero updateSuperhero(Superhero superhero);
 
-    Superhero updateSuperhero(Superhero superhero, JsonPatch jsonPatch) throws Exception;
+    /**
+     * Partially updates a {@link Superhero} using JSON Patch format
+     *
+     * @param superhero the {@link Superhero} to be updated
+     * @param jsonPatch the JSON Patch with the information to updated the {@link Superhero}
+     * @return the updated {@link Superhero}
+     * @throws IllegalArgumentException if the JSON Patch or the {@link Superhero} is invalid
+     *
+     * @see <a href=https://datatracker.ietf.org/doc/html/rfc6902/">RFC 6902</a> for more information avout the JSON
+     *      Patch format
+     */
+    Superhero updateSuperhero(Superhero superhero, JsonPatch jsonPatch) throws IllegalArgumentException;
 }
