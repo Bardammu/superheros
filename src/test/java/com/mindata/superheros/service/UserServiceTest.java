@@ -12,7 +12,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -37,9 +39,8 @@ public class UserServiceTest {
         Authority authority = new Authority();
         authority.setUsername(username);
         authority.setAuthority(role);
-
         User user = new User();
-        user.setUsername("john");
+        user.setUsername(username);
         user.setPassword(encodedPassword);
         user.setEnabled(true);
         user.setRoles(singletonList(authority));
@@ -49,18 +50,27 @@ public class UserServiceTest {
         User newUser = getUserFromDb(username);
 
         assertThat(newUser.getUsername(), is(username));
-        assertThat(newUser.getUsername(), is(encodedPassword));
+        assertThat(newUser.getPassword(), is(encodedPassword));
         assertThat(newUser.getEnabled(), is(true));
+        assertThat(newUser.getRoles().get(0).getAuthority(), is(role));
     }
 
     private User getUserFromDb(String username) {
+        String sqlUser = format("select * from users inner join authorities where users.username='%s'", username);
         User user = new User();
+        user.setRoles(new ArrayList<>());
+        Authority authority = new Authority();
         try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("select * from users where username=" + username)) {
-             user.setUsername(resultSet.getString("username"));
-             user.setPassword(resultSet.getString("password"));
-             user.setEnabled(resultSet.getBoolean("enabled"));
+             ResultSet resultSet = statement.executeQuery(sqlUser)) {
+             while (resultSet.next()) {
+                 user.setUsername(resultSet.getString("username"));
+                 user.setPassword(resultSet.getString("password"));
+                 user.setEnabled(resultSet.getBoolean("enabled"));
+                 authority.setUsername(user.getUsername());
+                 authority.setAuthority(resultSet.getString("authority"));
+                 user.getRoles().add(authority);
+             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
