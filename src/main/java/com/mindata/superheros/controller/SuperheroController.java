@@ -1,6 +1,7 @@
 package com.mindata.superheros.controller;
 
 import com.github.fge.jsonpatch.JsonPatch;
+import com.mindata.superheros.aop.LogRequestExecutionTime;
 import com.mindata.superheros.model.ModelUtils;
 import com.mindata.superheros.model.Superhero;
 import com.mindata.superheros.model.request.SuperheroRequest;
@@ -44,6 +45,7 @@ public class SuperheroController {
         this.superheroService = superheroService;
     }
 
+    @LogRequestExecutionTime
     @GetMapping
     public ResponseEntity<List<SuperheroResponse>> getSuperheros(@RequestParam Map<String, String> filteringParams) {
         List<Superhero> superheroes = superheroService.getSuperheroFilterBy(filteringParams);
@@ -53,6 +55,7 @@ public class SuperheroController {
         return ok(superheroResponses);
     }
 
+    @LogRequestExecutionTime
     @GetMapping("/{superheroId}")
     public ResponseEntity<SuperheroResponse> getSuperhero(@PathVariable Integer superheroId) {
         Optional<Superhero> superhero = superheroService.getSuperhero(superheroId);
@@ -60,6 +63,7 @@ public class SuperheroController {
         return superhero.map(s -> ok(getSuperheroResponseFromSuperhero(superhero.get()))).orElse(status(NOT_FOUND).build());
     }
 
+    @LogRequestExecutionTime
     @PostMapping
     public ResponseEntity<SuperheroResponse> postSuperhero(@RequestBody SuperheroRequest request) {
         Superhero superhero = getSuperheroFromRequest(request);
@@ -68,6 +72,7 @@ public class SuperheroController {
         return status(CREATED).body(getSuperheroResponseFromSuperhero(superhero));
     }
 
+    @LogRequestExecutionTime
     @PatchMapping(path = "/{superheroId}", consumes = "application/json")
     public ResponseEntity<SuperheroResponse> updateSuperhero(@PathVariable Integer superheroId, @RequestBody SuperheroRequest request) {
         if (!Objects.equals(superheroId, request.id())) {
@@ -80,6 +85,7 @@ public class SuperheroController {
         return accepted().body(getSuperheroResponseFromSuperhero(superhero));
     }
 
+    @LogRequestExecutionTime
     @PatchMapping(path = "/{superheroId}", consumes = "application/json-patch+json")
     public ResponseEntity<SuperheroResponse> updateSuperhero(@PathVariable Integer superheroId, @RequestBody JsonPatch jsonPatchRequest) {
         Optional<Superhero> superhero = superheroService.getSuperhero(superheroId);
@@ -91,6 +97,7 @@ public class SuperheroController {
         }
     }
 
+    @LogRequestExecutionTime
     @DeleteMapping("/{superheroId}")
     public ResponseEntity<String> removeSuperhero(@PathVariable Integer superheroId) {
         boolean deleted = superheroService.removeSuperhero(superheroId);

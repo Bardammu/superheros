@@ -1,5 +1,6 @@
 package com.mindata.superheros.controller;
 
+import com.mindata.superheros.aop.LogRequestExecutionTime;
 import com.mindata.superheros.model.User;
 import com.mindata.superheros.model.request.UserRequest;
 import com.mindata.superheros.model.response.UserResponse;
@@ -26,6 +27,7 @@ public class UserController {
         this.userService = userService;
     }
 
+    @LogRequestExecutionTime
     @PostMapping("/register")
     public ResponseEntity<UserResponse> registerUser(@RequestBody UserRequest userRequest) {
         User user = userService.register(getUserFromRequest(userRequest));
