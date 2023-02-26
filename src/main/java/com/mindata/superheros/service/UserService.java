@@ -13,7 +13,8 @@ public interface UserService {
      * Register a new user
      *
      * @param user the new {@link User}
+     * @return the new created {@link User}
      */
-    void register(User user);
+    User register(User user);
 
 }

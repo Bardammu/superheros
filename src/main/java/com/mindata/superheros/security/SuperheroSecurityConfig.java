@@ -13,6 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import javax.sql.DataSource;
 
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 
 @Configuration
 public class SuperheroSecurityConfig {
@@ -29,6 +30,7 @@ public class SuperheroSecurityConfig {
                 .csrf()
                 .disable()
                 .authorizeHttpRequests((authz) -> authz
+                        .requestMatchers(POST, "/api/users/register").permitAll()
                         .requestMatchers(GET, "/api/**").permitAll()
                         .anyRequest().authenticated()
                 ).httpBasic();

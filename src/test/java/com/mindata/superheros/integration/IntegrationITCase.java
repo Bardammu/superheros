@@ -24,12 +24,14 @@ public abstract class IntegrationITCase {
     protected String HOST;
     protected String SUPERHERO_URL;
     protected String USER_URL;
+    protected String USER_REGISTER_URL;
 
     @BeforeEach
     public void setUp() {
         HOST = "http://localhost:" + port;
         SUPERHERO_URL = HOST + "/api/superheros";
         USER_URL = HOST + "/api/users";
+        USER_REGISTER_URL = USER_URL + "/register";
 
         restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }

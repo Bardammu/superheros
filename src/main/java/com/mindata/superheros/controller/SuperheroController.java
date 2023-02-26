@@ -3,8 +3,8 @@ package com.mindata.superheros.controller;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.mindata.superheros.model.ModelUtils;
 import com.mindata.superheros.model.Superhero;
-import com.mindata.superheros.model.SuperheroRequest;
-import com.mindata.superheros.model.SuperheroResponse;
+import com.mindata.superheros.model.request.SuperheroRequest;
+import com.mindata.superheros.model.response.SuperheroResponse;
 import com.mindata.superheros.service.SuperheroService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -70,7 +70,7 @@ public class SuperheroController {
 
     @PatchMapping(path = "/{superheroId}", consumes = "application/json")
     public ResponseEntity<SuperheroResponse> updateSuperhero(@PathVariable Integer superheroId, @RequestBody SuperheroRequest request) {
-        if (!Objects.equals(superheroId, request.getId())) {
+        if (!Objects.equals(superheroId, request.id())) {
             return badRequest().build();
         }
 

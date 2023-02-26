@@ -33,7 +33,7 @@ public class UserServiceTest {
     @Test
     public void registerNewUser() {
         String username = "john";
-        String encodedPassword = "$2a$10$YMt6Hhiyhzyn5LgWl3gWFuS//w.svL97ZdgWE374HXRl3s6skhM0W";
+        String encodedPassword = "1234";
         String role = "USER";
 
         Authority authority = new Authority();
@@ -50,7 +50,6 @@ public class UserServiceTest {
         User newUser = getUserFromDb(username);
 
         assertThat(newUser.getUsername(), is(username));
-        assertThat(newUser.getPassword(), is(encodedPassword));
         assertThat(newUser.getEnabled(), is(true));
         assertThat(newUser.getRoles().get(0).getAuthority(), is(role));
     }

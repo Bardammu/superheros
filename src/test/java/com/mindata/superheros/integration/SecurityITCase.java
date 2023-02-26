@@ -1,6 +1,6 @@
 package com.mindata.superheros.integration;
 
-import com.mindata.superheros.model.SuperheroRequest;
+import com.mindata.superheros.model.request.SuperheroRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;

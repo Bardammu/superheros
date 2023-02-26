@@ -1,7 +1,7 @@
 package com.mindata.superheros.integration;
 
-import com.mindata.superheros.model.SuperheroRequest;
-import com.mindata.superheros.model.SuperheroResponse;
+import com.mindata.superheros.model.request.SuperheroRequest;
+import com.mindata.superheros.model.response.SuperheroResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -43,7 +43,7 @@ public class SuperheroITCase extends IntegrationITCase {
 
         assertThat(responseEntity.getStatusCode(), is(OK));
         assertThat(responseEntity.getHeaders().getContentType(), is(APPLICATION_JSON));
-        assertThat(requireNonNull(responseEntity.getBody()).getName(), is("Superman"));
+        assertThat(requireNonNull(responseEntity.getBody()).name(), is("Superman"));
     }
 
     @Test
@@ -84,8 +84,8 @@ public class SuperheroITCase extends IntegrationITCase {
 
         assertThat(responseEntity.getStatusCode(), is(CREATED));
         assertThat(responseEntity.getHeaders().getContentType(), is(APPLICATION_JSON));
-        assertThat(requireNonNull(responseEntity.getBody()).getName(), is("Spiderman"));
-        assertThat(requireNonNull(responseEntity.getBody()).getId(), is(3));
+        assertThat(requireNonNull(responseEntity.getBody()).name(), is("Spiderman"));
+        assertThat(requireNonNull(responseEntity.getBody()).id(), is(3));
     }
 
     @Test
@@ -99,8 +99,8 @@ public class SuperheroITCase extends IntegrationITCase {
 
         assertThat(responseEntity.getStatusCode(), is(ACCEPTED));
         assertThat(responseEntity.getHeaders().getContentType(), is(APPLICATION_JSON));
-        assertThat(requireNonNull(responseEntity.getBody()).getName(), is("Superman"));
-        assertThat(requireNonNull(responseEntity.getBody()).getOrigin(), is("Buenos Aires, Argentina, Earth"));
+        assertThat(requireNonNull(responseEntity.getBody()).name(), is("Superman"));
+        assertThat(requireNonNull(responseEntity.getBody()).origin(), is("Buenos Aires, Argentina, Earth"));
     }
 
     @Test
@@ -115,9 +115,9 @@ public class SuperheroITCase extends IntegrationITCase {
 
         assertThat(responseEntity.getStatusCode(), is(ACCEPTED));
         assertThat(responseEntity.getHeaders().getContentType(), is(APPLICATION_JSON));
-        assertThat(requireNonNull(responseEntity.getBody()).getName(), is("Superman"));
-        assertThat(requireNonNull(responseEntity.getBody()).getGender(), is("Male"));
-        assertThat(requireNonNull(responseEntity.getBody()).getOrigin(), is("Buenos Aires, Argentina, Earth"));
+        assertThat(requireNonNull(responseEntity.getBody()).name(), is("Superman"));
+        assertThat(requireNonNull(responseEntity.getBody()).gender(), is("Male"));
+        assertThat(requireNonNull(responseEntity.getBody()).origin(), is("Buenos Aires, Argentina, Earth"));
     }
 
     @Test
