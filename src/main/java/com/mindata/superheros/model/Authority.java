@@ -14,11 +14,10 @@ import jakarta.validation.constraints.Size;
 public class Authority {
 
     @Id
-    @Size(min = 4, max = 10)
     private String username;
 
     @NotNull
-    @Size(min = 4, max = 10)
+    @Size(max = 10)
     private String authority;
 
     public String getUsername() {

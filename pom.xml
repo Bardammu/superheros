@@ -55,6 +55,10 @@
             <version>${json-patch.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
 
         <!-- Test dependencies -->
         <dependency>

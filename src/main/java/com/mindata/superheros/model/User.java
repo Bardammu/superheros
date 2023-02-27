@@ -5,7 +5,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
@@ -21,11 +20,9 @@ public class User {
 
     @Id
     @NotBlank(message = "Username should not be null or blank")
-    @Size(min = 4, max = 10, message = "Username shouldn't be longer than 10 characters")
     private String username;
 
     @NotBlank(message = "Password should not be null or blank")
-    @Size(max = 100)
     private String password;
 
     @NotNull

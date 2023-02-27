@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.sql.Date;
 
@@ -24,10 +25,13 @@ public class Superhero {
 
     @NotBlank(message = "Name should not be null or blank")
     @Column(unique = true)
+    @Size(max = 50)
     private String name;
 
+    @Size(max = 50)
     private String gender;
 
+    @Size(max = 50)
     private String origin;
 
     private Date birthdate;
