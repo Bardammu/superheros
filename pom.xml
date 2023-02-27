@@ -20,6 +20,7 @@
         <java.version>17</java.version>
         <httpclient5.version>5.2.1</httpclient5.version>
         <json-patch.version>1.13</json-patch.version>
+        <dockerfile.maven.version>1.4.13</dockerfile.maven.version>
     </properties>
 
     <dependencies>
@@ -84,6 +85,29 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
+                <version>${dockerfile.maven.version}</version>
+                <executions>
+                    <execution>
+                        <id>build</id>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>tag</id>
+                        <goals>
+                            <goal>tag</goal>
+                        </goals>
+                        <configuration>
+                            <repository>mindata/${project.artifactId}</repository>
+                            <tag>${project.version}</tag>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
