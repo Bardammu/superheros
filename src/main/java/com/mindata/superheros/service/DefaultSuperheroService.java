@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static io.micrometer.common.util.StringUtils.isBlank;
 import static java.lang.String.format;
 
 /**
@@ -49,6 +50,14 @@ public class DefaultSuperheroService implements SuperheroService {
 
     @Override
     public Superhero addSuperhero(Superhero superhero) {
+        if (isBlank(superhero.getName())) {
+            throw new IllegalArgumentException("Superhero name is mandatory");
+        }
+
+        if (!superheroRepository.findByName(superhero.getName()).isEmpty()) {
+            throw new IllegalArgumentException(format("Superhero with name %s already exists", superhero.getName()));
+        }
+
         return superheroRepository.saveAndFlush(superhero);
     }
 

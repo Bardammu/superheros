@@ -1,32 +1,71 @@
 package com.mindata.superheros.service;
 
 import com.mindata.superheros.model.Superhero;
+import com.mindata.superheros.repository.SuperheroRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.jdbc.Sql;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
+import static java.sql.Date.valueOf;
+import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@Sql(scripts = "/sql/testData.sql", executionPhase = BEFORE_TEST_METHOD)
+@ExtendWith(SpringExtension.class)
 public class SuperheroServiceTestCase {
 
-    @Autowired
+    @Mock
+    private SuperheroRepository superheroRepository;
+
     private SuperheroService superheroService;
+
+    private Superhero superman;
+    private Superhero ironMan;
+    private List<Superhero> superheroes;
+
+    @BeforeEach
+    public void setUp() {
+        superman = new Superhero();
+        superman.setId(1);
+        superman.setName("Superman");
+        superman.setGender("Male");
+        superman.setOrigin("Krypton");
+        superman.setBirthdate(valueOf("1962-08-10"));
+
+        ironMan = new Superhero();
+        ironMan.setId(2);
+        ironMan.setName("Iron Man");
+        ironMan.setGender("Male");
+        ironMan.setOrigin("New York, US, Earth");
+        ironMan.setBirthdate(valueOf("1970-05-29"));
+
+        superheroes = List.of(superman, ironMan);
+
+        when(superheroRepository.findAll()).thenReturn(superheroes);
+        when(superheroRepository.findById(1)).thenReturn(of(superman));
+        when(superheroRepository.findById(2)).thenReturn(of(ironMan));
+        when(superheroRepository.findByName("Superman")).thenReturn(singletonList(superman));
+        when(superheroRepository.saveAndFlush(any(Superhero.class))).thenAnswer(returnsFirstArg());
+
+        superheroService = new DefaultSuperheroService(superheroRepository);
+    }
 
     @Test
     public void getSuperheros() {
@@ -69,16 +108,11 @@ public class SuperheroServiceTestCase {
         spiderman.setName("Spiderman");
         spiderman.setGender("Male");
         spiderman.setOrigin("New York, US, Earth");
-        spiderman.setBirthdate(Date.valueOf("1962-08-10"));
+        spiderman.setBirthdate(valueOf("1962-08-10"));
 
         Superhero newSuperhero = superheroService.addSuperhero(spiderman);
-        List<Superhero> superheroes = superheroService.getSuperheroes();
 
-
-        assertThat(newSuperhero.getName(), equalTo("Spiderman"));
-        assertThat(newSuperhero.getId(), is(3));
-        assertThat(superheroes.size(), is(3));
-        assertThat(superheroes, hasItem(hasProperty("name", equalTo("Spiderman"))));
+        assertThat(newSuperhero, is(spiderman));
     }
 
     @Test
@@ -87,16 +121,14 @@ public class SuperheroServiceTestCase {
         secondSuperman.setName("Superman");
         secondSuperman.setGender("Male");
         secondSuperman.setOrigin("Buenos Aires, Argentina, Earth");
-        secondSuperman.setBirthdate(Date.valueOf("1967-08-10"));
+        secondSuperman.setBirthdate(valueOf("1967-08-10"));
 
-        assertThrows(Exception .class,
+        IllegalArgumentException  exception = assertThrows(IllegalArgumentException .class,
                 () -> superheroService.addSuperhero(secondSuperman),
                 "Expected superheroService#addSuperhero(secondSuperman) to throw IllegalArgumentException , but it didn't"
         );
 
-        List<Superhero> superheroes = superheroService.getSuperheroes();
-
-        assertThat(superheroes.size(), is(2));
+        assertThat(exception.getMessage(), equalTo("Superhero with name Superman already exists"));
     }
 
     @Test
@@ -104,30 +136,29 @@ public class SuperheroServiceTestCase {
         Superhero noNameSuperhero = new Superhero();
         noNameSuperhero.setGender("Male");
         noNameSuperhero.setOrigin("New York, US, Earth");
-        noNameSuperhero.setBirthdate(Date.valueOf("1962-08-10"));
+        noNameSuperhero.setBirthdate(valueOf("1962-08-10"));
 
-        assertThrows(Exception.class,
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> superheroService.addSuperhero(noNameSuperhero),
-                "Expected superheroService#addSuperhero(noNameSuperhero) to throw ConstraintViolationException , but it didn't"
+                "Expected superheroService#addSuperhero(noNameSuperhero) to throw IllegalArgumentException , but it didn't"
         );
 
-        List<Superhero> superheroes = superheroService.getSuperheroes();
-
-        assertThat(superheroes.size(), is(2));
-        assertThat(superheroes, not(hasItem(hasProperty("name", is("Spiderman")))));
+        assertThat(exception.getMessage(), equalTo("Superhero name is mandatory"));
     }
 
     @Test
     public void removeSuperheroById() {
+        when(superheroRepository.existsById(anyInt())).thenReturn(true);
+
         boolean removedSuperhero = superheroService.removeSuperhero(1);
-        Optional<Superhero> superhero = superheroService.getSuperhero(1);
 
         assertThat(removedSuperhero, is(true));
-        assertThat(superhero, equalTo(empty()));
     }
 
     @Test
     public void removeSuperheroByIdUnknown() {
+        when(superheroRepository.existsById(anyInt())).thenReturn(false);
+
         boolean removedSuperhero = superheroService.removeSuperhero(10000);
 
         assertThat(removedSuperhero, is(false));
@@ -146,6 +177,8 @@ public class SuperheroServiceTestCase {
 
     @Test
     public void getSuperheroFilterByNameSubstring() {
+        when(superheroRepository.findAll(any(Specification.class))).thenReturn(superheroes);
+
         List<Superhero> superheroes = superheroService.getSuperheroFilterBy(singletonMap("name", "man"));
 
         assertThat(superheroes.size(), is(2));
@@ -155,6 +188,8 @@ public class SuperheroServiceTestCase {
 
     @Test
     public void getSuperheroFilterByOriginSubstring() {
+        when(superheroRepository.findAll(any(Specification.class))).thenReturn(singletonList(ironMan));
+
         List<Superhero> superheroes = superheroService.getSuperheroFilterBy(singletonMap("origin", "New York"));
 
         assertThat(superheroes.size(), is(1));
@@ -170,16 +205,11 @@ public class SuperheroServiceTestCase {
 
     @Test
     public void updateSuperhero() throws Exception {
-        Optional<Superhero> superman = superheroService.getSuperhero(1);
-        Superhero updatedSuperman = superman.orElseThrow(() -> new Exception("Couldn't get old Superman to update"));
-        updatedSuperman.setOrigin("Buenos Aires, Argentina, Earth");
+        superman.setOrigin("Buenos Aires, Argentina, Earth");
+        Superhero superhero = superheroService.updateSuperhero(superman);
 
-        Superhero superhero = superheroService.updateSuperhero(updatedSuperman);
-        List<Superhero> superheros = superheroService.getSuperheroes();
-
-        assertThat(superheros.size(), is(2));
-        assertThat(superhero.getName(), equalTo("Superman"));
-        assertThat(superhero.getOrigin(), equalTo("Buenos Aires, Argentina, Earth"));
+        assertThat(superhero.getName(), is("Superman"));
+        assertThat(superhero.getOrigin(), is("Buenos Aires, Argentina, Earth"));
     }
 
 }
