@@ -76,6 +76,16 @@ public class SuperheroITCase extends IntegrationITCase {
     }
 
     @Test
+    public void getSuperheroFilterByUnknownAttribute() {
+        String URL = SUPERHERO_URL + "?what=" + encode("nothing" , UTF_8) ;
+        ResponseEntity<SuperheroResponse[]> responseEntity = restTemplate.getForEntity(URL, SuperheroResponse[].class);
+
+        assertThat(responseEntity.getStatusCode(), is(OK));
+        assertThat(responseEntity.getHeaders().getContentType(), is(APPLICATION_JSON));
+        assertThat((requireNonNull(responseEntity.getBody()).length), is(0));
+    }
+
+    @Test
     public void postSuperhero() {
         AddSuperheroRequest postSuperheroRequest = new AddSuperheroRequest( "Spiderman", "Male", "New York, US, Earth", Date.valueOf("1962-08-10"));
 

@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.sql.Date.valueOf;
@@ -184,6 +185,15 @@ public class SuperheroServiceTestCase {
         assertThat(superheroes.size(), is(2));
         assertThat(superheroes, hasItem(hasProperty("name", is("Superman"))));
         assertThat(superheroes, hasItem(hasProperty("name", is("Iron Man"))));
+    }
+
+    @Test
+    public void getSuperheroFilterByNameSubstringAndUnknownAttribute() {
+        when(superheroRepository.findAll(any(Specification.class))).thenReturn(superheroes);
+
+        List<Superhero> superheroes = superheroService.getSuperheroFilterBy(Map.of("name","man","what","no"));
+
+        assertThat(superheroes.size(), is(0));
     }
 
     @Test

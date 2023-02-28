@@ -19,8 +19,7 @@ import java.util.Optional;
 
 import static io.micrometer.common.util.StringUtils.isBlank;
 import static java.lang.String.format;
-import static java.util.Collections.emptyMap;
-import static java.util.Objects.requireNonNullElse;
+import static java.util.Collections.emptyList;
 
 /**
  * Default implementation of {@link SuperheroService} service
@@ -31,6 +30,8 @@ import static java.util.Objects.requireNonNullElse;
 public class DefaultSuperheroService implements SuperheroService {
 
     private final SuperheroRepository superheroRepository;
+
+    private final List<String> validFilterList = List.of("name", "origin", "gender", "birthday");
 
     public DefaultSuperheroService(@Autowired SuperheroRepository superheroRepository) {
         this.superheroRepository = superheroRepository;
@@ -76,12 +77,16 @@ public class DefaultSuperheroService implements SuperheroService {
     }
 
     public List<Superhero> getSuperheroFilterBy(Map<String, String> filteringParameters) {
-        final Map<String, String> filteringParams = requireNonNullElse(filteringParameters, emptyMap());
+        boolean notValidFilter = filteringParameters.keySet().stream()
+                .anyMatch(key -> !validFilterList.contains(key.toLowerCase()));
+        if (!filteringParameters.isEmpty() && notValidFilter) {
+            return emptyList();
+        }
 
         Specification<Superhero> specification = (root, query, criteriaBuilder) -> {
             String sqlFormat = "%%%s%%";
             List<Predicate> predicates = new ArrayList<>();
-            filteringParams.forEach((param, value) ->
+            filteringParameters.forEach((param, value) ->
                     predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get(param)), format(sqlFormat, value.toLowerCase()))) );
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

@@ -49,7 +49,7 @@ public class SuperheroController {
         this.superheroService = superheroService;
     }
 
-    @Operation(summary = "Get all superheros. It possible to filter them using query parameters")
+    @Operation(summary = "Get all superheros. It's possible to filter them using query parameters. Valid filters are 'name', 'origin', 'gender' and 'birthday'")
     @LogRequestExecutionTime
     @GetMapping(produces = { APPLICATION_JSON_VALUE })
     public ResponseEntity<List<SuperheroResponse>> getSuperheros(@RequestParam Map<String, String> filteringParams) {
