@@ -21,6 +21,7 @@
         <httpclient5.version>5.2.1</httpclient5.version>
         <json-patch.version>1.13</json-patch.version>
         <dockerfile.maven.version>1.4.13</dockerfile.maven.version>
+        <springdoc-openapi-starter-webmvc-ui.version>2.0.2</springdoc-openapi-starter-webmvc-ui.version>
     </properties>
 
     <dependencies>
@@ -44,11 +45,14 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.java-json-tools</groupId>
@@ -57,8 +61,10 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc-openapi-starter-webmvc-ui.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- Test dependencies -->

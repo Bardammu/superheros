@@ -1,6 +1,6 @@
 package com.mindata.superheros.integration;
 
-import com.mindata.superheros.model.request.SuperheroRequest;
+import com.mindata.superheros.model.request.AddSuperheroRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +32,8 @@ public class SecurityITCase extends IntegrationITCase {
 
     @Test
     public void performAuthorizedRequest() {
-        SuperheroRequest superheroRequest = new SuperheroRequest(null, "Spiderman", "Male", "New York, US, Earth", Date.valueOf("1962-08-10"));
-        HttpEntity<SuperheroRequest> requestSuperheroEntity = new HttpEntity<>(superheroRequest);
+        AddSuperheroRequest postSuperheroRequest = new AddSuperheroRequest("Spiderman", "Male", "New York, US, Earth", Date.valueOf("1962-08-10"));
+        HttpEntity<AddSuperheroRequest> requestSuperheroEntity = new HttpEntity<>(postSuperheroRequest);
         ResponseEntity<String> responseEntity = restTemplateBasicAuth()
                 .postForEntity(SUPERHERO_URL, requestSuperheroEntity , String.class);
 

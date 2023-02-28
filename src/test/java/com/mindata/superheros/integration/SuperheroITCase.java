@@ -1,6 +1,7 @@
 package com.mindata.superheros.integration;
 
-import com.mindata.superheros.model.request.SuperheroRequest;
+import com.mindata.superheros.model.request.AddSuperheroRequest;
+import com.mindata.superheros.model.request.UpdateSuperheroRequest;
 import com.mindata.superheros.model.response.SuperheroResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
@@ -76,9 +77,9 @@ public class SuperheroITCase extends IntegrationITCase {
 
     @Test
     public void postSuperhero() {
-        SuperheroRequest superheroRequest = new SuperheroRequest(null, "Spiderman", "Male", "New York, US, Earth", Date.valueOf("1962-08-10"));
+        AddSuperheroRequest postSuperheroRequest = new AddSuperheroRequest( "Spiderman", "Male", "New York, US, Earth", Date.valueOf("1962-08-10"));
 
-        HttpEntity<SuperheroRequest> requestSuperheroEntity = new HttpEntity<>(superheroRequest);
+        HttpEntity<AddSuperheroRequest> requestSuperheroEntity = new HttpEntity<>(postSuperheroRequest);
         ResponseEntity<SuperheroResponse> responseEntity = restTemplateBasicAuth()
                 .postForEntity(SUPERHERO_URL, requestSuperheroEntity , SuperheroResponse.class);
 
@@ -91,8 +92,8 @@ public class SuperheroITCase extends IntegrationITCase {
     @Test
     public void updateSuperhero() {
         String URL = SUPERHERO_URL + "/1";
-        SuperheroRequest superheroRequest = new SuperheroRequest(1, "Superman", "Male", "Buenos Aires, Argentina, Earth", Date.valueOf("1984-07-04"));
-        HttpEntity<SuperheroRequest> requestSuperheroEntity = new HttpEntity<>(superheroRequest);
+        UpdateSuperheroRequest updateSuperheroRequest = new UpdateSuperheroRequest(1, "Superman", "Male", "Buenos Aires, Argentina, Earth", Date.valueOf("1984-07-04"));
+        HttpEntity<UpdateSuperheroRequest> requestSuperheroEntity = new HttpEntity<>(updateSuperheroRequest);
 
         ResponseEntity<SuperheroResponse> responseEntity = restTemplateBasicAuth()
                 .exchange(URL, PATCH, requestSuperheroEntity, SuperheroResponse.class);
@@ -137,8 +138,8 @@ public class SuperheroITCase extends IntegrationITCase {
     @Test
     public void updateSuperheroWithIdOnBodyDifferentFromIdOnUrl() {
         String URL = SUPERHERO_URL + "/1";
-        SuperheroRequest superheroRequest = new SuperheroRequest(2, "Superman", "Male", "Buenos Aires, Argentina, Earth", Date.valueOf("1984-07-04"));
-        HttpEntity<SuperheroRequest> requestSuperheroEntity = new HttpEntity<>(superheroRequest);
+        UpdateSuperheroRequest updateSuperheroRequest = new UpdateSuperheroRequest(2, "Superman", "Male", "Buenos Aires, Argentina, Earth", Date.valueOf("1984-07-04"));
+        HttpEntity<UpdateSuperheroRequest> requestSuperheroEntity = new HttpEntity<>(updateSuperheroRequest);
 
         ResponseEntity<SuperheroResponse> responseEntity = restTemplateBasicAuth()
                 .exchange(URL, PATCH, requestSuperheroEntity, SuperheroResponse.class);

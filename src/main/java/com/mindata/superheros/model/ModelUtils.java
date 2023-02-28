@@ -1,6 +1,7 @@
 package com.mindata.superheros.model;
 
-import com.mindata.superheros.model.request.SuperheroRequest;
+import com.mindata.superheros.model.request.AddSuperheroRequest;
+import com.mindata.superheros.model.request.UpdateSuperheroRequest;
 import com.mindata.superheros.model.request.UserRequest;
 import com.mindata.superheros.model.response.SuperheroResponse;
 import com.mindata.superheros.model.response.UserResponse;
@@ -14,13 +15,22 @@ import java.util.List;
  */
 public class ModelUtils {
 
-    public static Superhero getSuperheroFromRequest(SuperheroRequest superheroRequest) {
+    public static Superhero getSuperheroFromRequest(AddSuperheroRequest addSuperheroRequest) {
         Superhero superhero = new Superhero();
-        superhero.setId(superheroRequest.id());
-        superhero.setName(superheroRequest.name());
-        superhero.setGender(superheroRequest.gender());
-        superhero.setOrigin(superheroRequest.origin());
-        superhero.setBirthdate(superheroRequest.birthdate());
+        superhero.setName(addSuperheroRequest.name());
+        superhero.setGender(addSuperheroRequest.gender());
+        superhero.setOrigin(addSuperheroRequest.origin());
+        superhero.setBirthdate(addSuperheroRequest.birthdate());
+        return superhero;
+    }
+
+    public static Superhero getSuperheroFromRequest(UpdateSuperheroRequest updateSuperheroRequest) {
+        Superhero superhero = new Superhero();
+        superhero.setId(updateSuperheroRequest.id());
+        superhero.setName(updateSuperheroRequest.name());
+        superhero.setGender(updateSuperheroRequest.gender());
+        superhero.setOrigin(updateSuperheroRequest.origin());
+        superhero.setBirthdate(updateSuperheroRequest.birthdate());
         return superhero;
     }
 

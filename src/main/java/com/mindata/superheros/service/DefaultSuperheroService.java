@@ -19,6 +19,8 @@ import java.util.Optional;
 
 import static io.micrometer.common.util.StringUtils.isBlank;
 import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
+import static java.util.Objects.requireNonNullElse;
 
 /**
  * Default implementation of {@link SuperheroService} service
@@ -74,10 +76,12 @@ public class DefaultSuperheroService implements SuperheroService {
     }
 
     public List<Superhero> getSuperheroFilterBy(Map<String, String> filteringParameters) {
+        final Map<String, String> filteringParams = requireNonNullElse(filteringParameters, emptyMap());
+
         Specification<Superhero> specification = (root, query, criteriaBuilder) -> {
             String sqlFormat = "%%%s%%";
             List<Predicate> predicates = new ArrayList<>();
-            filteringParameters.forEach((param, value) ->
+            filteringParams.forEach((param, value) ->
                     predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get(param)), format(sqlFormat, value.toLowerCase()))) );
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

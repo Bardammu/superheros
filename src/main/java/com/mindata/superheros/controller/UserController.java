@@ -5,6 +5,7 @@ import com.mindata.superheros.model.User;
 import com.mindata.superheros.model.request.UserRequest;
 import com.mindata.superheros.model.response.UserResponse;
 import com.mindata.superheros.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import static com.mindata.superheros.model.ModelUtils.getUserFromRequest;
 import static com.mindata.superheros.model.ModelUtils.getUserResponseFromUser;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.status;
 
 @RestController
@@ -27,8 +29,9 @@ public class UserController {
         this.userService = userService;
     }
 
+    @Operation(summary = "Register a new user")
     @LogRequestExecutionTime
-    @PostMapping("/register")
+    @PostMapping(path = "/register", produces = { APPLICATION_JSON_VALUE })
     public ResponseEntity<UserResponse> registerUser(@RequestBody UserRequest userRequest) {
         User user = userService.register(getUserFromRequest(userRequest));
         return status(CREATED).body(getUserResponseFromUser(user));

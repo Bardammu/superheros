@@ -31,7 +31,7 @@ public class SuperheroSecurityConfig {
                 .disable()
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers(POST, "/api/users/register").permitAll()
-                        .requestMatchers(GET, "/api/**").permitAll()
+                        .requestMatchers(GET).permitAll()
                         .anyRequest().authenticated()
                 ).httpBasic();
 
